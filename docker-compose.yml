@@ -2,6 +2,32 @@ version: '3'
 services:
   broker: 
     image: eclipse-mosquitto
+    restart: always
     ports:
       - 1883:1883
       - 9001:9001
+  web:
+      image: blown302/robocar-car-api
+      command: ['python3', '/app/app.py']
+      restart: always
+      volumes:
+        - .:/data
+      ports:
+        - 5000:5000
+      environment:
+        - BROKER_HOST=broker
+  consumer:
+      image: blown302/robocar-image-consumer
+      restart: always
+      environment:
+        - BROKER_HOST=broker
+        - CLIENT_ID=blown302
+        - PYTHONUNBUFFERED=0
+      command: ['python3', '/app/app.py']
+      volumes:
+        - .:/data
+  ui:
+    image: blown302/robocar-ui
+    ports:
+      - 80:80
+
